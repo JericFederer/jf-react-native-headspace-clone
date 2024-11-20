@@ -5,13 +5,26 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Slider from '@react-native-community/slider';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 import { meditations } from '@/data';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import audio from '@assets/meditations/audio1.mp3';
 
 export default function MeditationDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
+
   const meditation = meditations.find((m) => m.id === Number(id));
+
+  const player = useAudioPlayer(audio);
+
+  const playerStatus = useAudioPlayerStatus(player);
+
+  const formatSeconds = (milliseconds: number) => {
+    const minutes = Math.floor(milliseconds / 60000);
+    const seconds = Math.floor((milliseconds % 60000) / 1000);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
 
   if (!meditation) {
     return <Text>Meditation not found!</Text>;
@@ -49,21 +62,16 @@ export default function MeditationDetails() {
         {/* Middle part of the screen */}
         <View className="bg-sky-500 flex-1 justify-center items-center">
           {/* Play/Pause Button */}
-          {/* <Pressable
+          <Pressable
             onPress={() => (player.playing ? player.pause() : player.play())}
             className="bg-zinc-800 self-center w-20 aspect-square rounded-full items-center justify-center"
           >
             <FontAwesome6
-              name={status.playing ? 'pause' : 'play'}
+              name={playerStatus.playing ? 'pause' : 'play'}
               size={24}
               color="snow"
             />
-          </Pressable> */}
-          <FontAwesome6
-              name='play'
-              size={24}
-              color="snow"
-            />
+          </Pressable>
         </View>
 
         {/* Bottom part of the screen */}
@@ -80,6 +88,8 @@ export default function MeditationDetails() {
               {/* <View className="bg-blue-400 h-2" /> */}
               <Slider
                 style={{width: "100%", height: 40}}
+                value={playerStatus.currentTime / playerStatus.duration}
+                onSlidingComplete={(value) => player.seekTo(value * playerStatus.duration)}
                 minimumValue={0}
                 maximumValue={1}
                 minimumTrackTintColor="#7dd4fc"
@@ -91,10 +101,10 @@ export default function MeditationDetails() {
             {/* Timer */}
             <View className="flex-row justify-between">
               <Text className="text-sky-100">
-                1:11
+                {formatSeconds(playerStatus.currentTime)}
               </Text>
               <Text className="text-sky-100">
-                11:11
+                {formatSeconds(playerStatus.duration)}
               </Text>
             </View>
 
