@@ -10,6 +10,7 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 import { meditations } from '@/data';
 import audio from '@assets/meditations/audio1.mp3';
+import AnimatedBackground from '@/components/AnimatedBackground';
 
 export default function MeditationDetails() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -17,6 +18,7 @@ export default function MeditationDetails() {
   const meditation = meditations.find((m) => m.id === Number(id));
 
   const player = useAudioPlayer(audio);
+  // const player = useAudioPlayer({ uri: "https://www.kozco.com/tech/organfinale.mp3" });
 
   const playerStatus = useAudioPlayerStatus(player);
 
@@ -31,11 +33,12 @@ export default function MeditationDetails() {
   }
 
   return (
-    <SafeAreaView className="bg-sky-600 flex-1 p-2 justify-between">
+    <SafeAreaView className="bg-sky-300 flex-1 p-2 justify-between">
+      <AnimatedBackground />
       {/* Page content */}
       <View className="flex-1">
         {/* Top part of the screen */}
-        <View className="bg-sky-300 flex-1">
+        <View className="flex-1">
           {/* Header */}
           <View className="flex-row items-center justify-between p-10">
             <AntDesign name="infocirlceo" size={24} color="black" />
@@ -60,7 +63,7 @@ export default function MeditationDetails() {
         </View>
 
         {/* Middle part of the screen */}
-        <View className="bg-sky-500 flex-1 justify-center items-center">
+        <View className="flex-1 justify-center items-center">
           {/* Play/Pause Button */}
           <Pressable
             onPress={() => (player.playing ? player.pause() : player.play())}
